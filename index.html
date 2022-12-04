@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>
+        Paragon - Miniprojekt
+    </title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <h2>Paragon</h2>
+    <table>
+        <tr>
+            <td>
+                <form onsubmit="event.preventDefault();onFormSubmit();" autocomplete="off">
+                    <div>
+                        <label>Nazwa</label>
+                        <label class="validation-error hide" id="nameValidationError">This field is required.</label>
+                        <input type="text" name="name" id="name">
+                    </div>
+                    <div>
+                        <label>Ilość</label>
+                        <label class="validation-error hide" id="amountValidationError">This field is required and cant be negative.</label>
+                        <input type="text" name="amount" id="amount">
+                    </div>
+                    <div>
+                        <label>Cena</label>
+                        <label class="validation-error hide" id="priceValidationError">This field is required and cant be negative.</label>
+                        <input type="text" name="price" id="price">
+                    </div>
+                    <div  class="form-action-buttons">
+                        <input type="submit" value="Submit">
+                    </div>
+                </form>
+            </td>
+            <td>
+                <table class="list" id="employeeList">
+                    <thead>
+                        <tr>
+                            <th>Nazwa</th>
+                            <th>Ilość</th>
+                            <th>Cena</th>
+                            <th>Suma</th>
+                            <th>Operacja</th>
+                        </tr>
+                    </thead>
+                    <!-- to dynamically add record on data submission -->
+                    <tbody>
+
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+    </table>
+    <script src="script.js"></script>
+</body>
+
+</html>
