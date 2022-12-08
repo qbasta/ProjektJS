@@ -1,117 +1,216 @@
-let selectedRow = null
 
-// function exceuted when form is submitted
-function onFormSubmit() {
-    if (validate()) {
-        let formData = readFormData();
-        if (selectedRow == null)
-            insertNewRecord(formData);
-        else
-            updateRecord(formData);
-        resetForm();
+var elem = document.getElementById("title")
+let tablica = []
+
+//localStorage.clear()
+
+// ladowanie informacji z pamięci lokalnej
+window.addEventListener('load', function () {
+    var json = localStorage.getItem("paragon")
+    if (json != null) {
+        tablica = JSON.parse(json)
+        showElements()
     }
+
+})
+
+// oczyt danych z pamieci lokalnej
+function showElements() {
+    if (tablica.length != 0) tablica.forEach(element => addNewRow(element))
+
 }
 
-// function to read recieve data submitted by user
-function readFormData() {
-    let formData = {};
-    formData.name = document.getElementById("name").value;
-    formData.amount = document.getElementById("amount").value;
-    formData.price = document.getElementById("price").value;
-    formData.suma = formData.amount * formData.price;
-    return formData; 
+// parametry dodawanych elementow
+function createElement(name, amount, price, total) {
+    return element = { name: name, amount: amount, price: price, total: total }
 }
 
-//function to display submitted data in a different table
-function insertNewRecord(data) {
-    let table = document.getElementById("employeeList").getElementsByTagName('tbody')[0];
-    // create a new row and insert data continuosly over the lenght of table
-    let newRow = table.insertRow(table.length); // table.length for the subsquent data to be submitted
-    cell1 = newRow.insertCell(0); 
-    cell1.innerHTML = data.name; //cell 1 of row 1
-    cell2 = newRow.insertCell(1);
-    cell2.innerHTML = data.amount; //cell 2 of row 1
-    cell3 = newRow.insertCell(2);
-    cell3.innerHTML = data.price; //cell 3 of row 1
-    cell4 = newRow.insertCell(3);
-    cell4.innerHTML = data.suma;   //cell 4 of row 1
-    cell5 = newRow.insertCell(4); 
-    cell5.innerHTML = `<a onClick="onEdit(this)">Edit</a>
-                       <a onClick="onDelete(this)">Delete</a>`;
+// jezeli dane nie spelniaja kryteria
+function validation() {
+    alert("Podaj poprawne dane")
 }
 
-function resetForm() {
-    document.getElementById("name").value = "";
-    document.getElementById("amount").value = "";
-    document.getElementById("price").value = "";
-    document.getElementById("suma").value = "";
-    selectedRow = null;
+// zmiana koloru linii z cena w przypadku linii nieparzystej
+
+function footerColor(newRow){
+    if (newRow.rowIndex % 2 != 0) changeFooterColor("#f2f2f2")
+    else changeFooterColor("white")
 }
 
-function onEdit(td) {
-    selectedRow = td.parentElement.parentElement;
-    document.getElementById("name").value = selectedRow.cells[0].innerHTML;
-    document.getElementById("amount").value = selectedRow.cells[1].innerHTML;
-    document.getElementById("price").value = selectedRow.cells[2].innerHTML;
-    document.getElementById("suma").value = selectedRow.cells[3].innerHTML;
-}
-function updateRecord(formData) {
-    selectedRow.cells[0].innerHTML = formData.name;
-    selectedRow.cells[1].innerHTML = formData.amount;
-    selectedRow.cells[2].innerHTML = formData.price;
-    selectedRow.cells[3].innerHTML = formData.suma;
+function changeFooterColor(color) {
+    const footer = document.getElementById("foot")
+    footer.style.backgroundColor = color
 }
 
-function onDelete(td) {
-    if (confirm('Are you sure to delete this record ?')) {
-        row = td.parentElement.parentElement;
-        document.getElementById("employeeList").deleteRow(row.rowIndex);
-        resetForm();
+
+// manipulowanie wartosciami na paragonie
+function addNewRow(tablicaRow) {
+    var table = document.getElementById('body')
+    var newRow = table.insertRow();
+    //dodanie indeksu do wartosci
+    addNewCell(newRow, newRow.rowIndex)
+    
+    // zmiana wartosci w polu nazwa po kliknieciu w pole
+    var newCellName = newRow.insertCell()
+    newCellName.innerHTML = tablicaRow.name
+    newCellName.addEventListener("click", function () {
+        let newName = prompt("Podaj nowa nazwe")
+        if (isNaN(newName)) {
+            newCellName.innerHTML = newName.toString()
+            tablicaRow.name = newName.toString()
+            changeRow(tablicaRow, newCellName)
+        }
+        else validation()
+    })
+    // zmiana wartosci w polu ilosc po kliknieciu w pole
+    var newCellAmount = newRow.insertCell()
+    newCellAmount.innerHTML = tablicaRow.amount
+    newCellAmount.addEventListener("click", function () {
+        let newAmount = prompt("Podaj nową ilość")
+        if (!isNaN(newAmount) && newAmount > 0 && newAmount % 1 === 0) {
+            newCellAmount.innerHTML = parseInt(newAmount)
+            newCellAmount.parentNode.children[4].innerHTML = ((parseInt(newCellAmount.parentNode.children[2].innerHTML) * parseFloat(newCellAmount.parentNode.children[3].innerHTML))).toFixed(2) + " zł"
+            tablicaRow.amount = newAmount
+            tablicaRow.total = (tablicaRow.price * tablicaRow.amount).toFixed(2)
+            changeRow(tablicaRow, newCellAmount)
+            updateFooterTotal()
+
+        }
+        else validation()
+    })
+    // zmiana wartosci w polu cena po kliknieciu w pole
+    var newCellPrice = newRow.insertCell()
+    newCellPrice.innerHTML = tablicaRow.price + " zł"
+    newCellPrice.addEventListener("click", function () {
+        let newPrice = prompt("Podaj nową cene")
+        if (!isNaN(newPrice) && newPrice > 0) {
+            newCellPrice.innerHTML = parseFloat(newPrice) + " zł"
+            newCellAmount.parentNode.children[4].innerHTML = ((parseInt(newCellAmount.parentNode.children[2].innerHTML) * parseFloat(newCellAmount.parentNode.children[3].innerHTML))).toFixed(2) + " zł"
+            tablicaRow.price = newPrice
+            tablicaRow.total = (tablicaRow.price * tablicaRow.amount).toFixed(2)
+            changeRow(tablicaRow, newCellPrice)
+            updateFooterTotal()
+
+        }
+        else validation()
+    })
+    // dodanie sumy do poszczegolnego produktu
+    addNewCell(newRow, tablicaRow.total + " zł")
+    // usuwanie wartosci z pamieci i listy
+    var x = newRow.insertCell()
+    x.innerHTML = "[x]"
+    x.addEventListener("click", function () {
+        let i = x.parentNode.rowIndex
+        let json = localStorage.getItem('paragon')
+        data = JSON.parse(json)
+        data.splice(i - 1, 1)
+        tablica = data.slice()
+        localStorage.clear()
+        localStorage.setItem("paragon", JSON.stringify(data))
+        var row = x.parentNode
+        row.parentNode.removeChild(row)
+        updateFooterTotal()
+        footerColor(newRow)
+
+    })
+    setTr()
+    updateFooterTotal()
+    footerColor(newRow)
+
+}
+// zapis zmiany wartosci w kolumnie
+function changeRow(tablicaRow, cell) {
+    tablica[cell.parentNode.rowIndex - 1] = tablicaRow
+    localStorage.clear()
+    localStorage.setItem("paragon", JSON.stringify(tablica))
+}
+// dodanie dodatkowej wartosci do rekordu
+function addNewCell(newRow, text) {
+    var newCell = newRow.insertCell()
+    newCell.innerHTML = text
+}
+
+// zmiana ceny ostatecznej
+function updateFooterTotal() {
+    var th = document.getElementsByTagName("th")
+    var total = 0.00
+    for (var i = 0; i < tablica.length; i++) {
+        total += parseFloat(tablica[i].total)
     }
+    th[th.length - 2].innerHTML = (parseFloat(total).toFixed(2) + " zł")
+
 }
 
-function validate() {
+// dodawanie nowej pozycji do paragonu
+const button = document.getElementById("button")
+button.addEventListener("click", function () {
+    const name = document.getElementById("name").value
+    const amount = document.getElementById("amount").value
+    const price = document.getElementById("price").value
 
-    if (document.getElementById("name").value == "") {
-        isValid = false;
-        document.getElementById("nameValidationError").classList.remove("hide");
+    // walidacja danych wprowadzanych na liste
+if (isNaN(name) && !isNaN(amount) && amount % 1 === 0 && amount.length != 0 && !isNaN(price) && price.length != 0 && amount > 0 && price > 0) {
+        if (tablica.length === 0) {
+            tablica.push(createElement(name, amount, parseFloat(price).toFixed(2), (amount * price).toFixed(2)))
+        } else {
+            tablica.push(createElement(name, amount, parseFloat(price).toFixed(2), (amount * price).toFixed(2)))
+
+        }
+        // przenoszenie danych do pamieci lokalnej
+        localStorage.setItem("paragon", JSON.stringify(tablica))
+        addNewRow(tablica[tablica.length - 1])
     } else {
-        isValid = true;
-        if (!document.getElementById("nameValidationError").classList.contains("hide"))
-            document.getElementById("nameValidationError").classList.add("hide");
+        validation()
+
     }
 
-    if (document.getElementById("amount").value <= 0 ?? document.getElementById("amount").value == ""){
-        isValid = false;
-        document.getElementById("amountValidationError").classList.remove("hide");
-    } else {
-        isValid = true;
-        if (!document.getElementById("amountValidationError").classList.contains("hide"))
-            document.getElementById("amountValidationError").classList.add("hide");
-    }
 
-    if (document.getElementById("price").value <= 0 ?? document.getElementById("price").value == ""){
-        isValid = false;
-        document.getElementById("priceValidationError").classList.remove("hide");
-    } else {
-        isValid = true;
-        if (!document.getElementById("priceValidationError").classList.contains("hide"))
-            document.getElementById("priceValidationError").classList.add("hide");
-    }
+})
 
-    return isValid;
+// nadanie atrybutow dla przesuwanych linii
+function setTr() {
+    const tr = document.getElementById("body")
+    for (var i = 0; i < tr.children.length; i++) {
+        tr.children[i].setAttribute('draggable', true)
+        tr.children[i].setAttribute('ondragstart', 'start()')
+        tr.children[i].setAttribute('ondragover', 'dragover()')
+    }
 }
 
 
-/*
-localStorage.setItem('items', JSON.stringify(newRow));
-const data = JSON.parse(localStorage.getItem('items'));
-
-const liMaker = (text) => {
-  const li = document.createElement('li');
-  li.textContent = text;
-  ul.appendChild(li);
+var row;
+function start() {
+    row = event.target
 }
 
-localStorage.setItem('items', )
-*/
+
+// przesuwanie obiektu na liscie
+function dragover() {
+    var e = event
+    e.preventDefault()
+
+    let children = Array.from(e.target.parentNode.parentNode.children)
+    if (children.indexOf(e.target.parentNode) > children.indexOf(row)) {
+        e.target.parentNode.after(row)
+        change(e, row)
+
+    }
+    else {
+        e.target.parentNode.before(row)
+        change(e, row)
+    }
+}
+
+//zmiana indeksu przesunietego obiektu
+function change(e, row) {
+    var table = document.getElementById('body')
+    for (var i = 0; i < table.children.length; i++) {
+        table.children[i].firstChild.innerHTML = i + 1
+    }
+    var a = tablica[e.target.parentNode.rowIndex - 1]
+    tablica[e.target.parentNode.rowIndex - 1] = tablica[row.rowIndex - 1]
+    tablica[row.rowIndex - 1] = a
+    localStorage.clear()
+    localStorage.setItem("paragon", JSON.stringify(tablica))
+    
+}

@@ -3,57 +3,79 @@
 
 <head>
     <title>
-        Paragon - Miniprojekt
+        Paragon
     </title>
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-    <h2>Paragon</h2>
-    <table>
-        <tr>
-            <td>
-                <form onsubmit="event.preventDefault();onFormSubmit();" autocomplete="off">
-                    <div>
-                        <label>Nazwa</label>
-                        <label class="validation-error hide" id="nameValidationError">This field is required.</label>
-                        <input type="text" name="name" id="name">
-                    </div>
-                    <div>
-                        <label>Ilość</label>
-                        <label class="validation-error hide" id="amountValidationError">This field is required and cant be negative.</label>
-                        <input type="text" name="amount" id="amount">
-                    </div>
-                    <div>
-                        <label>Cena</label>
-                        <label class="validation-error hide" id="priceValidationError">This field is required and cant be negative.</label>
-                        <input type="text" name="price" id="price">
-                    </div>
-                    <div  class="form-action-buttons">
-                        <input type="submit" value="Submit">
-                    </div>
-                </form>
-            </td>
-            <td>
-                <table class="list" id="employeeList">
-                    <thead>
-                        <tr>
-                            <th>Nazwa</th>
-                            <th>Ilość</th>
-                            <th>Cena</th>
-                            <th>Suma</th>
-                            <th>Operacja</th>
-                        </tr>
-                    </thead>
-                    <!-- to dynamically add record on data submission -->
-                    <tbody>
-
-                    </tbody>
-                </table>
-            </td>
-        </tr>
+    <header>
+      <h1>PARAGON</h1>
+    </header>
+    <main>
+      <table id="myTable">
+        <thead>
+          <tr>
+            <th class="id">LP</th>
+            <th class="name">NAZWA</th>
+            <th>ILOŚĆ</th>
+            <th>CENA</th>
+            <th>SUMA</th>
+            <th></th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="body">
+        </tbody>
+        <tfoot id="foot">
+            <tr>
+                <th scope="col"></th>
+                <th scope="col"></th>
+                <th scope="col"></th>
+                <th scope="col">RAZEM:</th>
+                <th scope="col">0.00 zł</th>
+                <th scope="col"></th>
+            </tr>
+        </tfoot>
     </table>
-    <script src="script.js"></script>
-</body>
+    <div class="centerText">
+        <div class="inline">
+            <div class="left">
+                <h1>Nowa pozycja</h1>
+            </div>
+            <div class="con">
+                <div>
+                    <label asp-for="Name">Nazwa:</label>
+                </div>
+                <div class="right">
+                    <input id="name" type="search" />
+                </div>
+            </div>
+            <div class="con">
+                <div>
+                    <label asp-for="Amount">Ilość:</label>
+                </div>
+                <div class="right">
+                    <input id="amount" type="search" />
+                </div>
+            </div>
+            <div class="con">
+                <div>
+                    <label asp-for="Price">Cena:</label>
+                </div>
+                <div class="right">
+                    <input id="price" type="search" />
+                </div>
+            </div>
+            <div class="con">
+                <div class="right">
+                    <button id="button" type="submit">Dodaj</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
+</main>
+</body>
+<script src="script.js"></script>
 </html>
